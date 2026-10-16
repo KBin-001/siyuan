@@ -7,7 +7,7 @@
 		"id": "20211226122549-jktxego",
 		"title": "快捷鍵",
 		"type": "doc",
-		"updated": "20261012014930"
+		"updated": "20261015120000"
 	},
 	"Children": [
 		{
@@ -19273,6 +19273,123 @@
 			"Properties": {
 				"id": "20220902195830-i3ncplk"
 			}
+		},
+		{
+			"ID": "20261015120000-rf5u0n0",
+			"Type": "NodeHeading",
+			"Properties": {
+				"id": "20261015120000-rf5u0n0",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "本機 Markdown 匯出"
+				}
+			],
+			"HeadingLevel": 2
+		},
+		{
+			"ID": "20261015120000-40zia8o",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-40zia8o",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "設定"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " - "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "匯出"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " - "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "本機 Markdown 匯出"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " 可在儲存成功後約三秒匯出變更文件。選擇筆記本或文件樹與本機目標資料夾，預覽路徑對應後儲存並啟用。目標資料夾位於核心執行的電腦，不能放在工作空間的 data 目錄內。已解鎖的加密筆記本會匯出為明文"
+				}
+			]
+		},
+		{
+			"ID": "20261015120000-fjr1y9p",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-fjr1y9p",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "在文件編輯器中，"
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Ctrl+S / Cmd+S"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " 會先儲存思源內部內容，再立即儲存關聯的本機檔案。尚未關聯檔案時，在「另存為」中選擇一次位置與 .md、.markdown 或 .txt 格式，以後直接儲存到該路徑，無需啟用本機 Markdown 匯出；取消選擇不會遺失內部儲存的內容"
+				}
+			]
+		},
+		{
+			"ID": "20261015200000-uoq91lu",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015200000-uoq91lu",
+				"updated": "20261015200000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "在本機桌面端，透過匯入檔案選擇器選擇 Markdown、TXT 檔案或資料夾時，會自動記錄原始檔案路徑；編輯匯入的文件後約三秒更新原始檔案。這適用於新的本機匯入，既有文件需要首次另存為，壓縮檔匯入仍為獨立副本。檔案關聯僅儲存在目前電腦的工作空間中，重新啟動後仍有效。重新命名或移動思源文件不會改變關聯的原始檔案路徑。Markdown 沿用現有轉換器，儲存時可能正規化原文排版；TXT 儲存可見的純文字，不保留富文字樣式。支援 UTF-8 與帶 BOM 的 UTF-16，保留 BOM 與 CRLF 換行。已開啟的關聯檔案會在桌面視窗失焦時約每 1.5 秒檢查外部變更，重新取得焦點時也會檢查。思源沒有尚未同步的修改時，自動載入檔案並保留原文件 ID，不立即寫回檔案。雙方都有修改時，只提示一次衝突並保留雙方內容；按 Ctrl+S 可以檢查衝突並確認載入本機檔案，思源版本仍保留在衝突副本中。載入前儲存文件歷史。資料庫、查詢嵌入、掛件、心智圖及區塊引用可能無法用 Markdown 完整表示，需要確認後載入"
+				}
+			]
+		},
+		{
+			"ID": "20261015120000-1z0xxwr",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-1z0xxwr",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "首次匯出使用「立即匯出」。已有檔案或被外部修改的檔案會保留並顯示為衝突，思源版本另存為副本。請對照檢查雙方內容；如需恢復對應路徑的自動更新，可自行移走衝突的本機檔案後重試。重新命名或移動文件會保留舊的匯出檔案。附件複製到 assets，並使用相對連結"
+				}
+			]
+		},
+		{
+			"ID": "20261015120000-9xq94rq",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-9xq94rq",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "可在設定項旁查看匯出狀態、最近成功時間，重試或複製診斷記錄"
+				}
+			]
 		}
 	]
 }

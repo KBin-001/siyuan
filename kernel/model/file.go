@@ -1815,6 +1815,9 @@ func moveDocs(fromPaths []string, toBoxID, toPath string, callback any, placeByC
 			util.PushEvent(evt)
 		}
 		refresh.flush()
+		for _, moved := range movedDocs {
+			notifyLocalMarkdownSubtree(moved.ToNotebook, moved.NewPath)
+		}
 	}()
 	count := 0
 	for _, fromPath := range fromPaths {
@@ -2290,6 +2293,9 @@ func renameDoc0(boxID, p, title string) (err error) {
 		}
 	}
 	publishDocRename(tree, titleChanged, emptyAttrUpdated)
+	if titleChanged {
+		notifyLocalMarkdownSubtree(boxID, p)
+	}
 	return
 }
 

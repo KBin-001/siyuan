@@ -1,3 +1,24 @@
+.local-markdown {
+  & > label {
+    margin-bottom: 12px;
+  }
+
+  &__actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__mapping {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  [data-md="conflicts"] {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
 .config-chatgpt__actions,
 .config-chatgpt__account {
   gap: 8px;

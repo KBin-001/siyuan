@@ -2,6 +2,7 @@ package apicontract
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"mime/multipart"
 )
@@ -49,6 +50,7 @@ type ImportMarkdownRequest struct {
 	LocalPath string `json:"localPath"`
 	ToPath    string `json:"toPath"`
 	SkipRoot  bool   `json:"skipRoot" api:"optional,nullable"`
+	WriteBack bool   `json:"writeBack" api:"optional"`
 }
 
 func init() {
@@ -67,6 +69,16 @@ func init() {
 			return request, err
 		}
 		_ = json.Unmarshal(fields["skipRoot"], &request.SkipRoot)
+		if value, ok := fields["writeBack"]; ok {
+			var flag *bool
+			if err = json.Unmarshal(value, &flag); err != nil {
+				return request, err
+			}
+			if flag == nil {
+				return request, errors.New("writeBack must be a boolean")
+			}
+			request.WriteBack = *flag
+		}
 		return request, nil
 	}
 }

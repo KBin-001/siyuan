@@ -7,7 +7,7 @@
 		"id": "20200813004551-gm0pbn1",
 		"title": "快捷键",
 		"type": "doc",
-		"updated": "20261012014930"
+		"updated": "20261015120000"
 	},
 	"Children": [
 		{
@@ -19306,6 +19306,123 @@
 			"Properties": {
 				"id": "20220902201142-hyb8kfm"
 			}
+		},
+		{
+			"ID": "20261015120000-t7iiis4",
+			"Type": "NodeHeading",
+			"Properties": {
+				"id": "20261015120000-t7iiis4",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "本地 Markdown 导出"
+				}
+			],
+			"HeadingLevel": 2
+		},
+		{
+			"ID": "20261015120000-fs1yiyo",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-fs1yiyo",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "设置"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " - "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "导出"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " - "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "本地 Markdown 导出"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " 可在保存成功后约三秒导出变更文档。选择笔记本或文档树以及本地目标目录，预览路径映射后保存并启用。目标目录位于内核运行的电脑，不能放在工作空间的 data 目录内。已解锁的加密笔记本会导出为明文"
+				}
+			]
+		},
+		{
+			"ID": "20261015120000-f3nfv0a",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-f3nfv0a",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "在文档编辑器中，"
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Ctrl+S / Cmd+S"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " 会先保存思源内部内容，再立即保存关联的本地文件。尚未关联文件时，在「另存为」中选择一次位置和 .md、.markdown 或 .txt 格式，以后直接保存到该路径，无需开启本地 Markdown 导出；取消选择不会丢失内部保存的内容"
+				}
+			]
+		},
+		{
+			"ID": "20261015200000-2005o0u",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015200000-2005o0u",
+				"updated": "20261015200000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "在本机桌面端，通过导入文件选择器选择 Markdown、TXT 文件或文件夹时，会自动记录原文件路径；编辑导入的文档后约三秒更新原文件。这适用于新的本地导入，已有文档需要首次另存为，压缩包导入仍为独立副本。文件关联仅保存在当前电脑的工作空间中，重启后仍有效。重命名或移动思源文档不会改变关联的原文件路径。Markdown 复用现有转换器，保存时可能规范化原文排版；TXT 保存可见的纯文本，不保留富文本样式。支持 UTF-8 和带 BOM 的 UTF-16，保留 BOM 和 CRLF 换行。已打开的关联文件会在桌面窗口失焦时约每 1.5 秒检查外部变化，重新获得焦点时也会检查。思源没有尚未同步的修改时，自动载入文件并保持原文档 ID，不立即回写文件。双方均有修改时，只提示一次冲突并保留双方内容；按 Ctrl+S 可以检查冲突并确认载入本地文件，思源版本仍保留在冲突副本中。载入前保存文档历史。数据库、查询嵌入、挂件、思维导图及区块引用可能无法用 Markdown 完整表示，需要确认后载入"
+				}
+			]
+		},
+		{
+			"ID": "20261015120000-fs8gcty",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-fs8gcty",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "首次导出使用「立即导出」。已有文件或被外部修改的文件会保留并显示为冲突，思源版本另存为副本。请对照检查双方内容；如需恢复映射路径的自动更新，可自行移走冲突的本地文件后重试。重命名或移动文档会保留旧的导出文件。附件复制到 assets，并使用相对链接"
+				}
+			]
+		},
+		{
+			"ID": "20261015120000-3aiackm",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-3aiackm",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "可在设置项旁查看导出状态、最近成功时间，重试或复制诊断日志"
+				}
+			]
 		}
 	]
 }

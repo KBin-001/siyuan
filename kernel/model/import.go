@@ -54,6 +54,7 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
+	"github.com/siyuan-note/siyuan/kernel/localexport"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
@@ -1473,6 +1474,11 @@ func resolveMarkdownImportTarget(boxID, toPath string) (baseHPath, baseTargetPat
 }
 
 func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) (err error) {
+	return ImportLocalFile(boxID, localPath, toPath, skipRoot, false)
+}
+
+// ImportLocalFile 仅为明确打开的本地文件建立保存映射，压缩包及普通 API 导入维持独立副本语义。
+func ImportLocalFile(boxID, localPath, toPath string, skipRoot, writeBack bool) (err error) {
 	box, err := getOpenedBox(boxID)
 	if nil != err {
 		return err
@@ -1493,6 +1499,41 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 	defer unlockSync()
 
 	FlushTxQueue()
+	var manager *localexport.Manager
+	if writeBack {
+		manager, err = LocalMarkdownManager()
+		if err != nil {
+			return err
+		}
+	}
+	type localSource struct{ path, revision string }
+	sources := map[string]localSource{}
+	parseFile := func(p string, data []byte) (*parse.Tree, string, string, string, error) {
+		if !writeBack {
+			tree, id, title, updated := parseStdMd(data, true)
+			return tree, id, title, updated, nil
+		}
+		if _, _, checkErr := manager.InspectSource(p); checkErr != nil {
+			return nil, "", "", "", checkErr
+		}
+		source := localexport.Source{}
+		text, decodeErr := source.Decode(data)
+		if decodeErr != nil {
+			return nil, "", "", "", decodeErr
+		}
+		if strings.EqualFold(filepath.Ext(p), ".txt") {
+			return parseLocalFileText(text), "", "", "", nil
+		}
+		tree, id, title, updated := parseStdMd([]byte(text), true)
+		return tree, id, title, updated, nil
+	}
+	isDocument := func(p string) bool {
+		if !writeBack {
+			return strings.HasSuffix(p, ".md") || strings.HasSuffix(p, ".markdown")
+		}
+		ext := strings.ToLower(filepath.Ext(p))
+		return ext == ".md" || ext == ".markdown" || writeBack && ext == ".txt"
+	}
 
 	baseHPath, baseTargetPath, err := resolveMarkdownImportTarget(boxID, toPath)
 	if err != nil {
@@ -1515,6 +1556,12 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 	defer spool.close()
 	stagedCount, stagedBytes := 0, 0
 	stageTree := func(tree *parse.Tree) error {
+		if writeBack && strings.EqualFold(filepath.Ext(sources[tree.ID].path), ".txt") {
+			if spool.plainText == nil {
+				spool.plainText = map[string]bool{}
+			}
+			spool.plainText[tree.ID] = true
+		}
 		if err := spool.add(tree); err != nil {
 			return err
 		}
@@ -1549,7 +1596,7 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 				return nil
 			}
 
-			if !d.IsDir() && (!strings.HasSuffix(currentPath, ".md") && !strings.HasSuffix(currentPath, ".markdown") ||
+			if !d.IsDir() && (!isDocument(currentPath) ||
 				strings.Contains(filepath.ToSlash(currentPath), "/assets/")) {
 				// 非 Markdown 文件作为资源文件处理 https://github.com/siyuan-note/siyuan/issues/13817
 				existName := assetsDone[currentPath]
@@ -1616,7 +1663,11 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 					return nil
 				}
 
-				if subMdFiles := util.GetFilePathsByExts(currentPath, []string{".md", ".markdown"}); 1 > len(subMdFiles) {
+				exts := []string{".md", ".markdown"}
+				if writeBack {
+					exts = append(exts, ".txt")
+				}
+				if subMdFiles := util.GetFilePathsByExts(currentPath, exts); 1 > len(subMdFiles) {
 					// 如果该文件夹中不包含 Markdown 文件则不处理 https://github.com/siyuan-note/siyuan/issues/11567
 					return nil
 				}
@@ -1634,7 +1685,7 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 				return nil
 			}
 
-			if !strings.HasSuffix(d.Name(), ".md") && !strings.HasSuffix(d.Name(), ".markdown") {
+			if !isDocument(d.Name()) {
 				return nil
 			}
 
@@ -1643,7 +1694,10 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 				return readErr
 			}
 
-			tree, yfmRootID, yfmTitle, yfmUpdated := parseStdMd(data, true)
+			tree, yfmRootID, yfmTitle, yfmUpdated, parseErr := parseFile(currentPath, data)
+			if parseErr != nil {
+				return parseErr
+			}
 			if nil == tree {
 				logging.LogErrorf("parse tree [%s] failed", currentPath)
 				return nil
@@ -1676,6 +1730,9 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 			targetPaths[curRelPath] = targetPath
 			tree.HPath = hPath
 			tree.Root.Spec = treenode.CurrentSpec
+			if writeBack {
+				sources[id] = localSource{currentPath, localexport.Digest(data)}
+			}
 
 			currentDir := filepath.Dir(currentPath)
 			ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -1781,12 +1838,14 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 		}
 	} else { // 导入单个文件
 		fileName := filepath.Base(localPath)
-		if !strings.HasSuffix(fileName, ".md") && !strings.HasSuffix(fileName, ".markdown") {
+		if !isDocument(fileName) {
 			return errors.New(Conf.Language(79))
 		}
 
-		title := strings.TrimSuffix(fileName, ".markdown")
-		title = strings.TrimSuffix(title, ".md")
+		title := strings.TrimSuffix(strings.TrimSuffix(fileName, ".markdown"), ".md")
+		if writeBack {
+			title = strings.TrimSuffix(fileName, filepath.Ext(fileName))
+		}
 		targetPath := strings.TrimSuffix(toPath, ".sy")
 		id := ast.NewNodeID()
 		targetPath = path.Join(targetPath, id+".sy")
@@ -1795,7 +1854,10 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 		if err != nil {
 			return err
 		}
-		tree, yfmRootID, yfmTitle, yfmUpdated := parseStdMd(data, true)
+		tree, yfmRootID, yfmTitle, yfmUpdated, parseErr := parseFile(localPath, data)
+		if parseErr != nil {
+			return parseErr
+		}
 		if nil == tree {
 			msg := fmt.Sprintf("parse tree [%s] failed", localPath)
 			logging.LogError(msg)
@@ -1824,6 +1886,9 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 		tree.Path = targetPath
 		tree.HPath = path.Join(baseHPath, title)
 		tree.Root.Spec = treenode.CurrentSpec
+		if writeBack {
+			sources[id] = localSource{localPath, localexport.Digest(data)}
+		}
 
 		localPathParentDir := filepath.Dir(localPath)
 		ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -1978,6 +2043,23 @@ func importFromLocalPath(boxID, localPath string, toPath string, skipRoot bool) 
 	}
 
 	IncSync()
+	for id, source := range sources {
+		if err = manager.BindSource(id, boxID, source.path, source.revision); err != nil {
+			return err
+		}
+		if bt := getExportBlockTreeInBox(id, boxID); bt != nil {
+			_, original, snapshotErr := filesys.LoadTreeSnapshot(boxID, bt.Path, NewLute())
+			if snapshotErr != nil {
+				return snapshotErr
+			}
+			manager.RememberSource(id, localexport.Digest(original))
+		}
+	}
+	if writeBack {
+		if err = manager.Flush(); err != nil {
+			return err
+		}
+	}
 	pushDocsImported(boxID, baseTargetPath, "markdown", importedRootIDs)
 	debug.FreeOSMemory()
 	return

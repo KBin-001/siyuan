@@ -78,6 +78,7 @@ import {filterHotkey} from "./commonHotkey";
 import {editorConfigApi} from "../../config/tabs/editorRuntime";
 import {copyPNGByLink} from "../../menus/util";
 import {globalCommand} from "./command/global";
+import {saveLocalMarkdown} from "../../protyle/util/localMarkdownSave";
 import {duplicateCompletely} from "../../protyle/render/av/action";
 import {copyTextByType} from "../../protyle/toolbar/util";
 import {onlyProtyleCommand} from "./command/protyle";
@@ -1949,6 +1950,14 @@ export const windowKeyDown = (app: App, event: KeyboardEvent) => {
     // https://github.com/siyuan-note/insider/issues/445
     if (matchHotKey("⌘S", event)) {
         event.preventDefault();
+        if (!event.repeat && !event.isComposing) {
+            const editor = getAllEditor().find(item =>
+                item.protyle.wysiwyg.element.contains(target) || item.protyle.title?.element.contains(target));
+            if (editor && !editor.protyle.disabled && editor.protyle.block.rootID &&
+                editor.protyle.notebookId && editor.protyle.path?.endsWith(".sy")) {
+                void saveLocalMarkdown(editor);
+            }
+        }
         return true;
     }
 };

@@ -310,7 +310,7 @@ export const openDataMigration = (options: IDataMigrationOptions = {}) => {
         const localPath = await ipcRenderer.invoke(Constants.SIYUAN_GET, {
             cmd: "showOpenDialog",
             defaultPath: window.siyuan.config.system.homeDir,
-            filters: isFile ? [{name: "Markdown", extensions: ["md", "markdown"]}] : [],
+            filters: isFile ? [{name: "Markdown / TXT", extensions: ["md", "markdown", "txt"]}] : [],
             properties: [isFile ? "openFile" : "openDirectory"],
         });
         if (localPath.filePaths.length === 0) {
@@ -321,6 +321,7 @@ export const openDataMigration = (options: IDataMigrationOptions = {}) => {
                 notebook: notebookID,
                 localPath: localPath.filePaths[0],
                 toPath: "/",
+                writeBack: true,
             }, completeContentImport);
         });
     };

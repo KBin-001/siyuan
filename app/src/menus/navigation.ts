@@ -1099,7 +1099,7 @@ export const genImportMenu = (notebookId: string, pathString: string) => {
             click: async () => {
                 let filters: FileFilter[] = [];
                 if (isDoc) {
-                    filters = [{name: "Markdown", extensions: ["md", "markdown"]}];
+                    filters = [{name: "Markdown / TXT", extensions: ["md", "markdown", "txt"]}];
                 }
                 const localPath = await ipcRenderer.invoke(Constants.SIYUAN_GET, {
                     cmd: "showOpenDialog",
@@ -1114,6 +1114,7 @@ export const genImportMenu = (notebookId: string, pathString: string) => {
                     notebook: notebookId,
                     localPath: localPath.filePaths[0],
                     toPath: pathString,
+                    writeBack: true,
                 }, () => {
                     reloadDocTree();
                 });

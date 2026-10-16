@@ -45,6 +45,27 @@ const request = (session = "drawer", action = "update", id = "block") => ({
 const success = {code: 0, data: [{doOperations: [{action: "update"}]}]};
 const response = (data: unknown) => new Response(JSON.stringify(data), {headers: {"Content-Type": "application/json"}});
 
+test("a save guard includes requests already in flight before Ctrl+S", async () => {
+    const protyle = editor();
+    let complete: (value: {code: number}) => void;
+    const pending = trackEditorSaveRequest("/api/transactions", request(), new Promise<{code: number}>(resolve => complete = resolve));
+    const guard = registerEditorSave(protyle);
+    complete({code: -1});
+    await pending;
+    await assert.rejects(guard.flush(), /Save failed/);
+    guard.dispose();
+});
+
+test("independent save guards on the same editor retain failures when another guard is disposed", async () => {
+    const protyle = editor();
+    const first = registerEditorSave(protyle);
+    const second = registerEditorSave(protyle);
+    second.dispose();
+    await trackEditorSaveRequest("/api/transactions", request(), Promise.resolve({code: -1}));
+    await assert.rejects(first.flush(), /Save failed/);
+    first.dispose();
+});
+
 test("tracks actual fetchPost business, network, HTTP and malformed save failures despite swallowed errors", async () => {
     for (const failure of ["negative", "positive", "network", "http", "missing-result", "missing-operations"]) {
         const guard = registerEditorSave(editor());

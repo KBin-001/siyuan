@@ -1282,7 +1282,7 @@ export type ImportDataRequestInput = { "file"?: Blob; };
 
 export type ImportDocumentData = { "type": "document"; };
 
-export type ImportMarkdownRequestInput = { "localPath": string; "notebook": string; "skipRoot"?: boolean | null; "toPath": string; };
+export type ImportMarkdownRequestInput = { "localPath": string; "notebook": string; "skipRoot"?: boolean | null; "toPath": string; "writeBack"?: boolean; };
 
 export type ImportNotebookArchiveRequestInput = { "file": Blob; "key"?: Blob; "password": string; };
 
@@ -1375,6 +1375,20 @@ export type LocalGraphConf = { "d3": GraphD3 | null; "dailyNote": boolean; "type
 export type LocalGraphRequestInput = { "conf"?: GraphConfigurationFieldsInput; "id"?: string | null; "k"?: string | null; "notebook"?: string | null; "reqId"?: JSONValue | null; "type"?: string | null; };
 
 export type LocalGraphResult = { "box": string; "conf": LocalGraphConf; "id": string; "links": Array<GraphLink | null> | null; "nodes": Array<GraphNode | null> | null; "reqId": JSONValue; };
+
+export type LocalMarkdownConfig = { "box": string; "enabled": boolean; "root": string; "target": string; };
+
+export type LocalMarkdownConfigInput = { "box": string; "enabled": boolean; "root": string; "target": string; };
+
+export type LocalMarkdownData = { "changed": boolean; "config": LocalMarkdownConfig; "documents": Array<LocalMarkdownDocument> | null; "entries": Array<LocalMarkdownEntry> | null; "error": string; "file"?: LocalMarkdownFile; "lastSuccess": string; "pending": number; "state": string; };
+
+export type LocalMarkdownDocument = { "exists": boolean; "id": string; "source": string; "target": string; };
+
+export type LocalMarkdownEntry = { "conflict": string; "error": string; "id": string; "lastSuccess": string; "path": string; "state": string; };
+
+export type LocalMarkdownFile = { "linked": boolean; "name": string; "path": string; "revision": string; };
+
+export type LocalMarkdownRequestInput = { "acceptExternal"?: boolean; "action"?: string; "config"?: LocalMarkdownConfigInput | null; "id"?: string; "path"?: string; "revision"?: string; };
 
 export type LockScreenRequestInput = { "lockScreenMode": number; };
 
@@ -4854,6 +4868,30 @@ export interface APIPOSTRoutes {
         /** 服务器路由要求；资源权限与笔记本租约仍由内核校验 */
         authorization?: readonly ["authenticated","admin"];
     };
+    /**
+     * 本机单向 Markdown 导出，默认关闭，仅可用于可写桌面内核。配置和 ID 映射不参与数据同步。
+     * action 省略或 status 返回状态；documents 列出 config.box 的范围候选；preview 返回选定范围的路径与现有文件占用。
+     * configure 校验绝对目标路径和文档范围后保存；run 为整个选定范围排队；retry 重试失败及冲突。
+     * file 验证 id 的读取权限后返回本机文件关联；提供 path 时检查候选位置并返回其 SHA-256 revision，不存在时为空串。
+     * bind 用 path 和显式 revision 建立本机关联，版本不匹配或位置已属另一文档时拒绝，不写源文件。
+     * current 刷新事务后同步保存关联的文件并返回实际错误；无关联时保留已有的可选镜像排队行为。
+     * 文件关联独立于导出开关，保存在本机 conf 中；保留原后缀、UTF-8/带 BOM 的 UTF-16 和换行形式。
+     * refresh 检查单个关联文件；仅外部修改时以条件写载入并返回 changed，保存历史且更新区块索引及编辑器。
+     * check 仅读取关联文件的摘要并返回 changed，不载入文档；未关联时返回 false。
+     * 内部快照也已变化时保留冲突副本并返回 -1；acceptExternal=true 表示用户已确认载入外部版本，仍保留思源副本。
+     * 旧映射没有快照时，仅在当前序列化结果与最后写回摘要一致时允许自动载入。失败不更新同步基线。
+     * 每个成功落盘的变更文档防抖三秒，持久化队列串行导出；目标不得位于工作空间 data 内部（含符号链接）。
+     * 加密笔记本必须解锁，读取及写出期间保持操作租约；显式配置允许在目标目录保留明文，不改变加密源格式。
+     * 重名附加稳定文档 ID；重命名和移动保留旧文件。首次占用及外部修改保留原文件并生成冲突副本，绝不静默覆盖。
+     * 失败通过状态及诊断字段报告，不影响源文档保存。未知 action、不可用范围及非法目标返回标准 -1/null 错误。
+     */
+    "/api/export/localMarkdown": {
+        request: LocalMarkdownRequestInput;
+        response: { "code": 0; "data": LocalMarkdownData; "msg": string; } | { "code": -1; "data": { "closeTimeout": number; } | null; "msg": string; };
+        body: "json";
+        /** 服务器路由要求；资源权限与笔记本租约仍由内核校验 */
+        authorization?: readonly ["authenticated","admin","writable"];
+    };
     "/api/export/preview": {
         request: ExportIDRequestInput;
         response: { "code": 0; "data": ExportPreviewData; "msg": string; } | { "code": -1; "data": { "closeTimeout": number; } | null; "msg": string; };
@@ -5474,6 +5512,8 @@ export interface APIPOSTRoutes {
      * 标准脚注定义保存为独立列表项，正文引用转换为指向列表项的上标静态块引用。
      * 多段内容保留在同一列表项内；多次引用共享目标，标签匹配忽略大小写，重复定义引用第一个匹配项。
      * 未定义的脚注不生成块引用，代码和转义的脚注文本保持原样；反链复用块引用索引。
+     * writeBack 默认 false；本机桌面文件选择器传 true 时支持 .md/.markdown/.txt，并记录本机原路径和读取版本。
+     * 关联后的编辑防抖写回原文件，Ctrl+S 立即写回；压缩包和未指定 writeBack 的导入不关联外部文件。
      */
     "/api/import/importStdMd": {
         request: ImportMarkdownRequestInput;

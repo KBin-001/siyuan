@@ -35,3 +35,17 @@ func TestImportMarkdownRequestCompatibility(t *testing.T) {
 		}
 	}
 }
+
+func TestImportLocalFileWriteBackContract(t *testing.T) {
+	for _, flag := range []string{"false", "true"} {
+		r, err := ImportStdMd.Decode(strings.NewReader(`{"notebook":"box","localPath":"file.txt","toPath":"/","writeBack":` + flag + `}`))
+		if err != nil || r.WriteBack != (flag == "true") {
+			t.Fatal(r, err)
+		}
+	}
+	for _, flag := range []string{`"true"`, `1`, `{}`, `null`} {
+		if _, err := ImportStdMd.Decode(strings.NewReader(`{"notebook":"box","localPath":"file.txt","toPath":"/","writeBack":` + flag + `}`)); err == nil {
+			t.Fatalf("invalid writeBack accepted: %s", flag)
+		}
+	}
+}

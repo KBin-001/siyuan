@@ -7,7 +7,7 @@
 		"id": "20200924100950-9op5xi1",
 		"title": "Shortcuts",
 		"type": "doc",
-		"updated": "20261012014930"
+		"updated": "20261015120000"
 	},
 	"Children": [
 		{
@@ -19276,6 +19276,123 @@
 							]
 						}
 					]
+				}
+			]
+		},
+		{
+			"ID": "20261015120000-udsxn2v",
+			"Type": "NodeHeading",
+			"Properties": {
+				"id": "20261015120000-udsxn2v",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "Local Markdown export"
+				}
+			],
+			"HeadingLevel": 2
+		},
+		{
+			"ID": "20261015120000-xcf7w48",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-xcf7w48",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Settings"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " - "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Export"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " - "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Local Markdown export"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " exports changed documents about three seconds after saving. Select a notebook or document tree and a local destination, preview the mapping, then save and enable. The destination is on the kernel computer and must be outside the workspace data directory. Unlocked encrypted notebooks are exported as plaintext"
+				}
+			]
+		},
+		{
+			"ID": "20261015120000-rrixh76",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-rrixh76",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "In a document editor, "
+				},
+				{
+					"Type": "NodeTextMark",
+					"TextMarkType": "kbd",
+					"TextMarkTextContent": "Ctrl+S / Cmd+S"
+				},
+				{
+					"Type": "NodeText",
+					"Data": " saves pending input internally and then writes the associated local file immediately. If no file is associated, choose its location and .md, .markdown or .txt format once in Save as. Later saves reuse that path without enabling local Markdown export; canceling the dialog keeps the internal save"
+				}
+			]
+		},
+		{
+			"ID": "20261015200000-mlrq6f1",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015200000-mlrq6f1",
+				"updated": "20261015200000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "On the local desktop, selecting a Markdown or TXT file or folder through the import file picker records the original file paths automatically. Editing the imported documents updates those files after about three seconds. This applies to new local imports; existing documents need a first Save as, and archive imports remain independent copies. File associations belong to this workspace on this computer and survive restarts. Renaming or moving a document keeps its associated file path. Markdown uses the existing export converter and may normalize source formatting; TXT stores visible plain text without rich formatting. UTF-8 and UTF-16 with BOM are supported, preserving BOM and CRLF line endings. For an open associated file, external changes are checked about every 1.5 seconds while the desktop window is unfocused and again when it regains focus. If SiYuan has no unsynchronized edits, the file is loaded automatically without writing it back, and the existing document ID is retained. If both versions changed, one conflict notice is shown and both versions are kept. Press Ctrl+S to review the conflict and confirm loading the local file; the SiYuan version remains in the conflict copy. A document history is saved before reloading. Database, embedded-query, widget, mind-map and block-reference content requires confirmation because Markdown may not fully represent it"
+				}
+			]
+		},
+		{
+			"ID": "20261015120000-0b8xtcr",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-0b8xtcr",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "Use Export now for the initial export. Existing or externally modified files are preserved and shown as conflicts, with the SiYuan version saved separately. Review both versions; move the conflicting local file aside yourself before retrying if you want to resume updates at the mapped path. Renaming or moving a document keeps its old exported file. Attachments are copied into assets with relative links"
+				}
+			]
+		},
+		{
+			"ID": "20261015120000-jk7xeuq",
+			"Type": "NodeParagraph",
+			"Properties": {
+				"id": "20261015120000-jk7xeuq",
+				"updated": "20261015120000"
+			},
+			"Children": [
+				{
+					"Type": "NodeText",
+					"Data": "Export status, the last successful export time, retry and diagnostic log copying are available beside the controls"
 				}
 			]
 		}

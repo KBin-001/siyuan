@@ -377,7 +377,9 @@ var importStdMd = contractHandler(apicontract.ImportStdMd, func(c *gin.Context, 
 	}
 
 	var err error
-	if skipRoot {
+	if request.WriteBack {
+		err = model.ImportLocalFile(notebook, localPath, toPath, skipRoot, true)
+	} else if skipRoot {
 		err = model.ImportFromLocalPathSkipRoot(notebook, localPath, toPath)
 	} else {
 		err = model.ImportFromLocalPath(notebook, localPath, toPath)

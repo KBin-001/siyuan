@@ -33,6 +33,7 @@ type markdownImportEntry struct {
 // markdownImportSpool 只在内存中保留路径和链接索引，文档树使用独立会话密钥加密暂存。
 // 临时文件不是恢复数据；来源 Markdown 保持原样，退出导入时关闭文件并清除会话密钥。
 type markdownImportSpool struct {
+	plainText   map[string]bool
 	file        *os.File
 	key         []byte
 	singleTree  *parse.Tree
@@ -169,9 +170,11 @@ func (spool *markdownImportSpool) finish(write func(*parse.Tree) error, flush fu
 		if err != nil {
 			return fmt.Errorf("read Markdown import staging entry %d: %w", i, err)
 		}
-		convertMdHyperlinks2WikiLinks(tree)
-		convertWikiLinksAndTags(tree, spool.searchLinks)
-		mergeTextAndHandlerNestedInlines(tree, luteEngine)
+		if !spool.plainText[entry.id] {
+			convertMdHyperlinks2WikiLinks(tree)
+			convertWikiLinksAndTags(tree, spool.searchLinks)
+			mergeTextAndHandlerNestedInlines(tree, luteEngine)
+		}
 		if err = write(tree); err != nil {
 			return err
 		}

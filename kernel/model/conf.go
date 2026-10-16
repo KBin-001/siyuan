@@ -779,6 +779,11 @@ func closeKernel(force, setCurrentWorkspace bool, execInstallPkg int, recovery *
 	sql.FlushQueue()
 
 	util.IsExiting.Store(true)
+	if localMarkdown.manager != nil {
+		if err := localMarkdown.manager.Flush(); err != nil {
+			logging.LogErrorf("persist local Markdown queue: %s", err)
+		}
+	}
 	// 等待正在执行的路径批次退出，未完成任务保留在配置目录供下次启动恢复。
 	diagnostic.Stage("wait for path refresh")
 	hpathRefresh.Lock()
@@ -1128,6 +1133,7 @@ func InitBoxes() {
 	}
 
 	recoverDocHPaths()
+	InitLocalMarkdown()
 	logging.LogInfof("tree/block count [%d/%d]", treenode.CountTrees(), blockCount)
 }
 

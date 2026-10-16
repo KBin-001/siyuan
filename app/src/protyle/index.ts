@@ -37,6 +37,7 @@ import {Title} from "./header/Title";
 import {Background} from "./header/Background";
 import {disabledProtyle, enableProtyle, onGet, setReadonlyByConfig} from "./util/onGet";
 import {reloadProtyle} from "./util/reload";
+import {registerLocalFileRefresh} from "./util/localFileRefresh";
 import {renderBacklink} from "./wysiwyg/renderBacklink";
 import {setEmpty} from "../mobile/util/setEmpty";
 /// #if MOBILE
@@ -125,6 +126,7 @@ export class Protyle {
     public readonly version: string;
     public protyle: IProtyle;
     private destroyed = false;
+    private stopLocalFileRefresh?: () => void;
 
     /**
      * @param id 要挂载 Protyle 的元素或者元素 ID。
@@ -212,6 +214,7 @@ export class Protyle {
         // lite 模式用前端操作日志 undo（不依赖 kernel），其余走 kernel 的 GlobalUndoLog。
         this.protyle.undo = this.protyle.lite ? new LocalUndo() : new Undo();
         this.protyle.wysiwyg = new WYSIWYG(this.protyle);
+        this.stopLocalFileRefresh = registerLocalFileRefresh(this.protyle);
         setAutoDirection(this.protyle.wysiwyg.element, window.siyuan.config.editor.autoDirection);
         initFoldedRender(this.protyle);
         initEditorTabs(this.protyle);
@@ -672,6 +675,7 @@ export class Protyle {
 
     /** 销毁编辑器 */
     public destroy() {
+        this.stopLocalFileRefresh?.();
         this.destroyed = true;
         /// #if MOBILE
         unregisterMobileSecondaryEditor(this);

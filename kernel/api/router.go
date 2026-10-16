@@ -629,6 +629,7 @@ func registerAssetRoutes(ginServer *gin.Engine) {
 
 // registerExportRoutes 注册本域的契约路由。
 func registerExportRoutes(ginServer *gin.Engine) {
+	ginServer.Handle("POST", "/api/export/localMarkdown", contractRouteHandlers(apicontract.LocalMarkdown, localMarkdown)...)
 	ginServer.Handle("POST", "/api/export/exportNotebookMd", contractRouteHandlers(apicontract.ExportNotebookMd, exportNotebookMd)...)
 	ginServer.Handle("POST", "/api/export/exportNotebooksMd", contractRouteHandlers(apicontract.ExportNotebooksMd, exportNotebooksMd)...)
 	ginServer.Handle("POST", "/api/export/exportMds", contractRouteHandlers(apicontract.ExportMds, exportMds)...)

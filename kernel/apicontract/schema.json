@@ -29034,6 +29034,9 @@
         },
         "toPath": {
           "type": "string"
+        },
+        "writeBack": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -30649,6 +30652,228 @@
         "nodes",
         "reqId"
       ],
+      "additionalProperties": false
+    },
+    "LocalMarkdownConfig": {
+      "type": "object",
+      "properties": {
+        "box": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "root": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "box",
+        "enabled",
+        "root",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "LocalMarkdownConfigInput": {
+      "type": "object",
+      "properties": {
+        "box": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "root": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "box",
+        "enabled",
+        "root",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "LocalMarkdownData": {
+      "type": "object",
+      "properties": {
+        "changed": {
+          "type": "boolean"
+        },
+        "config": {
+          "$ref": "#/$defs/LocalMarkdownConfig"
+        },
+        "documents": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/LocalMarkdownDocument"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "entries": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/LocalMarkdownEntry"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "type": "string"
+        },
+        "file": {
+          "$ref": "#/$defs/LocalMarkdownFile"
+        },
+        "lastSuccess": {
+          "type": "string"
+        },
+        "pending": {
+          "type": "integer"
+        },
+        "state": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "changed",
+        "config",
+        "documents",
+        "entries",
+        "error",
+        "lastSuccess",
+        "pending",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "LocalMarkdownDocument": {
+      "type": "object",
+      "properties": {
+        "exists": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "exists",
+        "id",
+        "source",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "LocalMarkdownEntry": {
+      "type": "object",
+      "properties": {
+        "conflict": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "lastSuccess": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "conflict",
+        "error",
+        "id",
+        "lastSuccess",
+        "path",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "LocalMarkdownFile": {
+      "type": "object",
+      "properties": {
+        "linked": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "linked",
+        "name",
+        "path",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "LocalMarkdownRequestInput": {
+      "type": "object",
+      "properties": {
+        "acceptExternal": {
+          "type": "boolean"
+        },
+        "action": {
+          "type": "string"
+        },
+        "config": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LocalMarkdownConfigInput"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        }
+      },
       "additionalProperties": false
     },
     "LockScreenRequestInput": {
@@ -141400,6 +141625,86 @@
               },
               "data": {
                 "$ref": "#/$defs/ExportNamedZipData"
+              },
+              "msg": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "msg",
+              "data"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "enum": [
+                  -1
+                ]
+              },
+              "data": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "closeTimeout": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "closeTimeout"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "msg": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "msg",
+              "data"
+            ],
+            "additionalProperties": true
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/export/localMarkdown",
+      "handler": "localMarkdown",
+      "authorization": [
+        "authenticated",
+        "admin",
+        "writable"
+      ],
+      "body": "json",
+      "request": {
+        "$ref": "#/$defs/LocalMarkdownRequestInput"
+      },
+      "response": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "enum": [
+                  0
+                ]
+              },
+              "data": {
+                "$ref": "#/$defs/LocalMarkdownData"
               },
               "msg": {
                 "type": "string"

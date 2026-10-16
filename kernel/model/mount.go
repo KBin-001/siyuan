@@ -163,6 +163,7 @@ func RenameBox(boxID, name string) (err error) {
 	}
 	IncSync()
 	logging.LogInfof("renamed box [%s] to [%s]", boxID, name)
+	notifyLocalMarkdownSubtree(boxID, "/")
 	return
 }
 

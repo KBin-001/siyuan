@@ -24,6 +24,7 @@ import {unmountAssetsTab} from "./assets";
 import {unmountOCRTab} from "./ocr";
 import {getHostCapabilities} from "../util/hostCapabilities";
 import {unmountWorkspaceStorage} from "./tabs/workspaceStorage";
+import {unmountLocalMarkdown} from "./tabs/localMarkdown";
 /// #if !MOBILE
 import {openNativeSettings} from "./setting/nativeWindow";
 import {closeSettingDialog, prepareSettingDialog} from "./setting/interface";
@@ -72,6 +73,8 @@ export const openSettingDialog = (app: App, initialTab: TSettingTab = "editor") 
         width: "max(70vw, min(90vw, 900px))",
         height: "90vh",
         destroyCallback() {
+            const exportRoot = settingDialogRef.element?.querySelector<HTMLElement>('.config__tab-container[data-name="export"]');
+            if (exportRoot) unmountLocalMarkdown(exportRoot);
             disposeDrag?.();
             const bazaarRoot = settingDialogRef.element?.querySelector('.config__tab-container[data-name="bazaar"]') as HTMLElement | null;
             if (bazaarRoot) {

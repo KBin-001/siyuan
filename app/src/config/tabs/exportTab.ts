@@ -7,6 +7,7 @@ import type {SettingTabBuilder} from "../setting/builder";
 import {Constants} from "../../constants";
 import {exportConfigApi} from "./exportRuntime";
 import {fetchPost} from "../../util/fetch";
+import {localMarkdownHtml, localMarkdownSearchStrings, mountLocalMarkdown} from "./localMarkdown";
 
 const registerExportReferencesGroup = (tab: SettingTabBuilder) => {
     const group = tab.group("references", window.siyuan.languages.configGroupReferences);
@@ -201,6 +202,14 @@ const mountExportPandocStack = (root: HTMLElement) => {
 /// #endif
 
 export const registerExportTab = (tab: SettingTabBuilder) => {
+    /// #if !MOBILE
+    tab.group("localMarkdown", window.siyuan.languages.localMarkdown).slot({
+        key: "localMarkdown",
+        keywords: localMarkdownSearchStrings(),
+        html: localMarkdownHtml,
+        afterMount: mountLocalMarkdown,
+    });
+    /// #endif
     registerExportReferencesGroup(tab);
     registerExportFormatGroup(tab);
     registerExportPdfGroup(tab);
