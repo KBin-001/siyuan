@@ -11,7 +11,7 @@ import (
 
 	"github.com/88250/lute/ast"
 	ignore "github.com/sabhiram/go-gitignore"
-	"github.com/siyuan-note/dejavu"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

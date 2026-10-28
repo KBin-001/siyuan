@@ -15,8 +15,8 @@ import (
 	"strings"
 
 	"github.com/88250/lute/ast"
-	"github.com/siyuan-note/dejavu"
 	"github.com/siyuan-note/dejavu/entity"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 )
 

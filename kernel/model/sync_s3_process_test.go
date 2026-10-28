@@ -25,7 +25,7 @@ type s3ProcessScenario struct {
 	Modified                             int64
 }
 
-func TestS3DesktopSameSecondConflictReproducer(t *testing.T) {
+func TestS3DesktopSameSecondConcurrentEdits(t *testing.T) {
 	const scenarioEnv = "SIYUAN_TEST_S3_PROCESS_SCENARIO"
 	const boxID = "20261028000000-notes01"
 	const docPath = "/20261028000001-note001.sy"
@@ -89,9 +89,6 @@ func TestS3DesktopSameSecondConflictReproducer(t *testing.T) {
 		Conf.Save()
 		return
 	}
-	if os.Getenv("SIYUAN_REPRO_S3_SAME_SECOND") != "1" {
-		t.Skip("known unresolved engine collision; set SIYUAN_REPRO_S3_SAME_SECOND=1 to reproduce ticket 03")
-	}
 	storage := &manualS3Storage{objects: map[string][]byte{}}
 	server := httptest.NewServer(storage)
 	defer server.Close()
@@ -106,7 +103,7 @@ func TestS3DesktopSameSecondConflictReproducer(t *testing.T) {
 		if err := os.WriteFile(scenarioFile, data, 0600); err != nil {
 			t.Fatal(err)
 		}
-		command := exec.Command(os.Args[0], "-test.run=^TestS3DesktopSameSecondConflictReproducer$", "-test.timeout=30s")
+		command := exec.Command(os.Args[0], "-test.run=^TestS3DesktopSameSecondConcurrentEdits$", "-test.timeout=30s")
 		command.Env = append(os.Environ(), scenarioEnv+"="+scenarioFile)
 		if output, err := command.CombinedOutput(); err != nil {
 			t.Fatalf("%s/%s failed: %v\n%s", device, action, err, output)
@@ -116,7 +113,9 @@ func TestS3DesktopSameSecondConflictReproducer(t *testing.T) {
 	step(firstRoot, "first", "seed", "shared baseline", stamp)
 	step(secondRoot, "second", "sync", "", 0)
 	step(firstRoot, "first", "edit", "first independent offline edit", stamp+10)
-	step(secondRoot, "second", "edit", "second independent offline edit", stamp+10)
+	step(secondRoot, "second", "edit", "other independent offline edit", stamp+10)
+	step(firstRoot, "first", "sync", "", 0)
+	step(secondRoot, "second", "sync", "", 0)
 	step(firstRoot, "first", "sync", "", 0)
 	step(secondRoot, "second", "sync", "", 0)
 	step(firstRoot, "first", "sync", "", 0)
@@ -125,6 +124,9 @@ func TestS3DesktopSameSecondConflictReproducer(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		if len(files) != 2 {
+			t.Fatalf("expected one document and one conflict copy after repeated sync, got %d", len(files))
+		}
 		var firstFound, secondFound bool
 		for _, file := range files {
 			data, err := os.ReadFile(file)
@@ -132,7 +134,7 @@ func TestS3DesktopSameSecondConflictReproducer(t *testing.T) {
 				t.Fatal(err)
 			}
 			firstFound = firstFound || bytes.Contains(data, []byte("first independent offline edit"))
-			secondFound = secondFound || bytes.Contains(data, []byte("second independent offline edit"))
+			secondFound = secondFound || bytes.Contains(data, []byte("other independent offline edit"))
 		}
 		if !firstFound || !secondFound {
 			t.Fatalf("independent desktops lost an offline edit: first=%t second=%t", firstFound, secondFound)

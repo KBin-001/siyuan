@@ -8,7 +8,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/siyuan-note/dejavu"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 )
 
 // processAssetDownloadRecovery 仅在同步流程中恢复，并在确认变更前更新内核状态

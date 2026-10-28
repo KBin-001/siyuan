@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/siyuan-note/dejavu"
 	"github.com/siyuan-note/dejavu/entity"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 )
 
 func TestAppearanceChangedPackages(t *testing.T) {

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/88250/go-humanize"
-	"github.com/siyuan-note/dejavu"
 	"github.com/siyuan-note/dejavu/entity"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 )
 
 func SnapshotCreatedInRange(created, startTime, endTime int64) bool {

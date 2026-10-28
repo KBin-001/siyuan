@@ -1,0 +1,27 @@
+{
+  "upstream": "github.com/siyuan-note/dejavu",
+  "version": "v0.0.0-20261011111741-4465ef631977",
+  "files": {
+    "asset_download.go": "0bf161739d53d4877bc65219222fd44ef9c7ea90aeef582ee058992f6b1f042f",
+    "asset_recovery.go": "5583120379524ea31005fdc2ca81b135be2305c8d7e16471afc1295eed8a3213",
+    "backup.go": "15086de7a81d8e376830fb1ca9c40107eeba40ad70349cb82444fabdab5dd5e6",
+    "chunk_source.go": "8f1f34d265c0d98a0bc1687f72230a90ad54a3bdc22d0583e2d535ed1e603946",
+    "diff.go": "d8eb0928b7e1643058c6038c2a86f051c3bdeb4fcec17fadf90377f7a41e138b",
+    "ignore.go": "a4501900e7c9a97a09a5fb47d7fe3b557ba0aa15e0c9f728f5deb1456fb206ce",
+    "ignore_other.go": "efde6e0168d6b87fbecd73123925fd21b228b67743514b74fdc6d7365bb6b934",
+    "ignore_windows.go": "e0561d26d3cbdc6afcdb90cbb6932768353c432fbaf056df04defdcfdabae395",
+    "index_file.go": "f1d96069a99338c95803869195e3e928bf80d7126f2f6466805c94da8ba0fa51",
+    "LICENSE": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+    "log.go": "ef904fb2e724d876c7c010446f562c36d67430e216f8e4fd345da899cf9806ef",
+    "options.go": "3815df809c6197d1ca9c73ae7fce4bacb2ea9f7c014b0352152017d122beb260",
+    "ref.go": "27b700bde2ca04224300b6604daba38676d47fc0018934b4d3b40b383883df9c",
+    "repo.go": "81f0fe26e5478e715b6b5931e0ee3c6ce9d0f95b5749dc074cb093ab6a2b1507",
+    "snapshot.go": "c4faf4a9ac8cb7133f21d1d8bd0570f5dc5250a4d6e6ba84cfb3d1cd49a60765",
+    "store.go": "b17568a01a1d3e53959ef3a6ea3679c314921a5f91ff5fa50550aa0ea8d67c34",
+    "sync.go": "5eda64063b4b2e9bcff38722dacd5c7b04623adff9404bf988ff4c559dff796f",
+    "sync_download.go": "fbfc500b9d5e3297cbf4ac003ca4de7c78dbac57436f52aa57637ed700faf895",
+    "sync_lock.go": "5f0a5bb956aa5eca69d15ecdd4cd912339df1334359134f9e6d251c88be42e37",
+    "sync_manual.go": "8bc05fbf20fe668719580dd411a65612578d0873f37760d901f034c2dc7c8841",
+    "sync_merge.go": "e495359703980bcd4f7617de9eaa95913f6d9c7ccc9fc4eb6a3de63827214694"
+  }
+}

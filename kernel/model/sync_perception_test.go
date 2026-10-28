@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/siyuan-note/dejavu"
 	"github.com/siyuan-note/dejavu/cloud"
 	"github.com/siyuan-note/eventbus"
 	"github.com/siyuan-note/siyuan/kernel/conf"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

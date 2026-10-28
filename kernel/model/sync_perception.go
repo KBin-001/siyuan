@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"sync/atomic"
 
-	"github.com/siyuan-note/dejavu"
 	"github.com/siyuan-note/filelock"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

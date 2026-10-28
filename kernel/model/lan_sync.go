@@ -26,10 +26,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/siyuan-note/dejavu"
 	"github.com/siyuan-note/dejavu/lansync"
 	"github.com/siyuan-note/logging"
 	"github.com/siyuan-note/siyuan/kernel/conf"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

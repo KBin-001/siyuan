@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/siyuan-note/dejavu"
 	"github.com/siyuan-note/siyuan/kernel/bazaar"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 	"github.com/siyuan-note/siyuan/kernel/util"
 )
 

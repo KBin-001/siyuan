@@ -12,11 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/siyuan-note/dejavu"
 	"github.com/siyuan-note/dejavu/entity"
 	dejavuutil "github.com/siyuan-note/dejavu/util"
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/filesys"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
 	"github.com/siyuan-note/siyuan/kernel/util"

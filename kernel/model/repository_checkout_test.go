@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/siyuan-note/dejavu"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 )
 
 func TestCheckoutRepoSnapshotRefreshesPartialFailure(t *testing.T) {

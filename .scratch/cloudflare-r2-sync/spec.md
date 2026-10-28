@@ -14,6 +14,8 @@
 
 用户已于 2026-10-28 批准该阶段方案。它降低多电脑同步成本，但首次设备接入仍有配置导入步骤，不等同于自建账号登录。
 
+2026-10-28 实施补充：用户明确批准修复已复现的底层引擎同秒冲突缺陷，并完成旧数据兼容验证。新 S3 文件对象使用含内容信息的 v2 标识，旧标识继续可读；不改变加密、压缩、分块、密钥和元数据结构，不重写旧快照。必要引擎根包以固定来源纳入项目，保留原许可证与哈希，确保修复可随本仓库复现构建；详细边界见 `kernel/internal/dejavu/README.md`。
+
 ## User Stories
 
 1. As a personal desktop user, I want to configure my own R2 storage without an official account, so that I can use synchronization independently.

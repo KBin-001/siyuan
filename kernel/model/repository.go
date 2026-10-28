@@ -47,7 +47,6 @@ import (
 	"github.com/88250/lute/render"
 	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/siyuan-note/dataparser"
-	"github.com/siyuan-note/dejavu"
 	"github.com/siyuan-note/dejavu/cloud"
 	"github.com/siyuan-note/dejavu/entity"
 	"github.com/siyuan-note/encryption"
@@ -60,6 +59,7 @@ import (
 	"github.com/siyuan-note/siyuan/kernel/cache"
 	"github.com/siyuan-note/siyuan/kernel/conf"
 	"github.com/siyuan-note/siyuan/kernel/heif"
+	"github.com/siyuan-note/siyuan/kernel/internal/dejavu"
 	"github.com/siyuan-note/siyuan/kernel/sql"
 	"github.com/siyuan-note/siyuan/kernel/task"
 	"github.com/siyuan-note/siyuan/kernel/treenode"
@@ -3110,7 +3110,8 @@ func newRepositoryWithAssetSourceLocked() (ret *dejavu.Repo, err error) {
 	dataDir := util.DataDir
 	scope := assetDownloadScope(confSyncSnapshot.Provider, cloudConf, confRepoSnapshot.Key)
 	ret, err = dejavu.NewRepoWithOptions(dejavu.Options{
-		DataPath: util.DataDir, RepoPath: util.RepoDir, HistoryPath: util.HistoryDir, TempPath: util.TempDir,
+		ContentFileIDs: confSyncSnapshot.Provider == conf.ProviderS3,
+		DataPath:       util.DataDir, RepoPath: util.RepoDir, HistoryPath: util.HistoryDir, TempPath: util.TempDir,
 		DeviceID: confSystemSnapshot.ID, DeviceName: confSystemSnapshot.Name, DeviceOS: confSystemSnapshot.OS,
 		AESKey: confRepoSnapshot.Key, IgnoreLines: ignoreLines, Cloud: cloudRepo,
 		IgnoreRulePath: syncIgnoreRulePath, HiddenDirectoryNames: []string{".siyuan"},
