@@ -50,6 +50,7 @@ muslbin/
 
 # Workflows
 **/__pycache__
+/.cache/windows-desktop/
 # OCR 模型和运行时由固定版本、校验摘要的发布准备脚本生成
 /.cache/ocr/
 /app/stage/ocr/models/
