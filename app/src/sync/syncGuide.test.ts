@@ -17,24 +17,37 @@ type ListResponse = {
     };
 };
 
-const loadSyncGuide = (mobile: boolean, provider: number) => {
+const loadSyncGuide = (mobile: boolean, provider: number, paid = true) => {
     const source = readFileSync(resolve(process.cwd(), "src/sync/syncGuide.ts"), "utf8");
     const processed = parse(source, {MOBILE: mobile, BROWSER: true}, false, true);
     const code = transpileModule(processed, {compilerOptions: {module: ModuleKind.CommonJS}}).outputText;
     const sync = {
-        provider, cloudName: "work",
+        provider, cloudName: "work", enabled: true, mode: 2,
         s3: {endpoint: "https://s3.example.com", accessKey: "test-key", secretKey: "test-secret",
             bucket: "notes.backup", region: "us-east-1"},
     };
     const requests: {url: string, data: {name?: string; sync?: {cloudName: unknown}}, reply: (response: ListResponse) => void}[] = [];
+    const messages: string[] = [];
+    const config = {sync, readonly: false, repo: {key: "test-repository-key"}};
     const moduleExports = {} as {
+        syncGuide: () => void;
         renderSyncCloudList: (element: Element, reload: boolean, cb: (ready: boolean) => void) => void;
         bindSyncCloudListEvent: (element: Element, cb?: (ready: boolean) => void) => void;
     };
     runInNewContext(code, {
         exports: moduleExports,
-        window: {siyuan: {config: {sync}, languages: {emptyContent: "Empty", cloudConfigTip: "Configure storage"}}},
+        window: {siyuan: {config, languages: {emptyContent: "Empty", cloudConfigTip: "Configure storage",
+            _kernel: {29: "Subscription required", 214: "Membership required"}}}},
         require: (name: string) => {
+            if (name === "../util/needSubscribe") {
+                return {isPaidUser: () => paid, needSubscribe: () => !paid};
+            }
+            if (name === "../dialog/message") {
+                return {showMessage: (message: string) => messages.push(message)};
+            }
+            if (name === "../config/util/about") {
+                return {getCloudURL: () => "https://example.com"};
+            }
             if (name === "../config/util/configApi") {
                 return {config: {set: (_path: string, value: unknown, applied?: () => void) => {
                     requests.push({url: "/api/setting/patch", data: {sync: {cloudName: value}}, reply: (response: ListResponse) => {
@@ -67,7 +80,7 @@ const loadSyncGuide = (mobile: boolean, provider: number) => {
     } as unknown as Element;
     const readiness: boolean[] = [];
     return {
-        ...moduleExports, list, requests, sync, readiness,
+        ...moduleExports, list, requests, sync, config, messages, readiness,
         render: () => moduleExports.renderSyncCloudList(list, true, (ready) => readiness.push(ready)),
         select: () => {
             moduleExports.bindSyncCloudListEvent(list);
@@ -82,6 +95,25 @@ const loadSyncGuide = (mobile: boolean, provider: number) => {
         },
     };
 };
+
+test("an unpaid desktop user can manually synchronize S3 while other providers retain membership checks", () => {
+    for (const provider of [2, 0, 3, 4]) {
+        const guide = loadSyncGuide(false, provider, false);
+        guide.syncGuide();
+        assert.deepEqual(guide.requests.map(request => request.url), provider === 2 ? ["/api/sync/performSync"] : []);
+        assert.equal(guide.messages.length, provider === 2 ? 0 : 1);
+    }
+});
+
+test("manual S3 sync still respects read-only mode and disabled synchronization", () => {
+    const guide = loadSyncGuide(false, 2, false);
+    guide.config.readonly = true;
+    guide.syncGuide();
+    guide.config.readonly = false;
+    guide.sync.enabled = false;
+    guide.syncGuide();
+    assert.equal(guide.requests.length, 0);
+});
 
 const listResponse = (cloudName: string, checkedSyncDir: string): ListResponse => ({
     code: 0,

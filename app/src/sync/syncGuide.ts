@@ -184,7 +184,7 @@ export const syncGuide = (app?: App) => {
         openSyncSetting(app);
         showMessage(window.siyuan.languages._kernel[29].replaceAll("${accountServer}", getCloudURL("")));
         return;
-    } else if (!isPaidUser()) {
+    } else if (window.siyuan.config.sync.provider !== 2 && !isPaidUser()) {
         openSyncSetting(app);
         showMessage(window.siyuan.languages._kernel[214].replaceAll("${accountServer}", getCloudURL("")));
         return;

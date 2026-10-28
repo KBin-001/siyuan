@@ -260,3 +260,20 @@ All Go libraries above are dependencies in `kernel/go.mod`. GitHub org: `siyuan-
 ## 7. Response style
 
 1. **Language:** Match the user's language; do not mix languages mid-sentence (keep proper nouns / identifiers in their original form)
+
+
+---
+
+## Agent skills
+
+### Issue tracker
+
+Track issues and specs as local Markdown under `.scratch/<feature>/`. Before reading, creating, or updating a spec or ticket, read `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the role mapping in `docs/agents/triage-labels.md` when assigning or changing a ticket's triage status.
+
+### Domain docs
+
+Use a single-context glossary and architecture decision records. Before exploring a feature or recording a domain decision, read `docs/agents/domain.md`.

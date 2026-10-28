@@ -350,13 +350,13 @@ test("a read-only transition during rule loading prevents saving", async () => {
     assert.equal(ui.buttons.cancel.disabled, false);
 });
 
-const setupPanels = (mobile: boolean) => {
+const setupPanels = (mobile: boolean, paid = true) => {
     const languages = JSON.parse(readFileSync("appearance/langs/en.json", "utf8"));
     const sync = {provider: 3, enabled: true, s3: {endpoint: "https://s3.example.com", bucket: "notes"},
         webdav: {endpoint: "https://dav.example.com", username: "user"}, local: {endpoint: "/cloud"}};
     const createElement = () => {
         const classes = new Set<string>();
-        return {innerHTML: "", querySelector: (): null => null, classList: {
+        return {innerHTML: "", querySelector: (): null => null, closest() { return this; }, classList: {
             contains: (name: string) => classes.has(name),
             toggle(name: string, force: boolean) {
                 if (force) classes.add(name); else classes.delete(name);
@@ -367,18 +367,34 @@ const setupPanels = (mobile: boolean) => {
     const intro = createElement();
     const row = createElement();
     const purge = createElement();
-    const elements = {"#syncProviderConfig": intro, "#syncProviderConfigRow": row, "#cloudRepoPurgeBlock": purge};
+    const enabled = createElement();
+    const elements = {"#syncProviderConfig": intro, "#syncProviderConfigRow": row, "#cloudRepoPurgeBlock": purge,
+        "#sync.enabled": enabled};
     const root = {querySelector: (selector: string) => elements[selector as keyof typeof elements] || null};
     const exports = {} as {refreshSyncTabPanels: (root: unknown) => void;
         getSyncProviderConfigRowKeywords: () => string[]; getSyncProviderConfigKeywords: () => string[]};
     runInNewContext(code, {
         exports, CSS: {escape: (value: string) => value},
         window: {siyuan: {config: {sync, readonly: false, system: {container: mobile ? "android" : "std"}}, languages}},
-        require: () => ({escapeHtmlTextAndAttr, canPurgeRepo, isPaidUser: () => true, needSubscribe: () => false,
+        require: () => ({escapeHtmlTextAndAttr, canPurgeRepo, isInIOS: () => false, isPaidUser: () => paid, needSubscribe: () => !paid,
             getCloudURL: () => "https://example.com", getHostCapabilities: () => ({importExport: !mobile})}),
     });
-    return {sync, intro, row, purge, root, exports, languages};
+    return {sync, intro, row, purge, enabled, root, exports, languages};
 };
+
+test("S3 settings remain available without membership while other providers retain their entitlement", () => {
+    const ui = setupPanels(false, false);
+    for (const provider of [2, 0, 3, 4, 2]) {
+        ui.sync.provider = provider;
+        ui.exports.refreshSyncTabPanels(ui.root);
+        assert.equal(ui.row.classList.contains("fn__none"), provider !== 2, String(provider));
+        assert.equal(ui.enabled.classList.contains("fn__none"), provider !== 2, String(provider));
+        if (provider === 2) {
+            assert.match(ui.row.innerHTML, /data-action="configureSync"/);
+            assert.ok(!ui.intro.innerHTML.includes(ui.languages.proFeature));
+        }
+    }
+});
 
 for (const mobile of [false, true]) {
     test(`configuration summaries keep quotes and markup inside text and title (mobile=${mobile})`, () => {

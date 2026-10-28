@@ -26,16 +26,18 @@ export const refreshSyncModeRelatedItems = (root: Element) => {
     setSyncModeRelatedConfigItemVisible(root);
 };
 
+const isSyncProviderAllowed = () => SYNC_PROVIDER_DEFS[window.siyuan.config.sync.provider]?.isProviderConfigAllowed() ?? false;
+
 /** 根据云端同步和运行环境刷新局域网同步配置项可见性 */
 export const refreshLANSyncConfigItemVisibility = (root: Element) => {
-    const visible = window.siyuan.config.sync.provider === 0 ? !needSubscribe("") : isPaidUser();
+    const visible = isSyncProviderAllowed();
     root.querySelector(`#${CSS.escape("sync.lan.enabled")}`)?.closest(".config-item")?.classList.toggle(
         "fn__none", !visible || !window.siyuan.config.sync.enabled || window.siyuan.config.system.container === "docker");
 };
 
 /** 搜索时区分局域网同步的前置条件和硬性使用限制 */
 export const getLANSyncSearchAvailability = () => {
-    const entitled = window.siyuan.config.sync.provider === 0 ? !needSubscribe("") : isPaidUser();
+    const entitled = isSyncProviderAllowed();
     if (!entitled || window.siyuan.config.system.container === "docker") {
         return {available: false};
     }
@@ -46,7 +48,7 @@ export const getLANSyncSearchAvailability = () => {
 };
 
 const setSyncConfigItemVisible = (root: Element) => {
-    const visible = window.siyuan.config.sync.provider === 0 ? !needSubscribe("") : isPaidUser();
+    const visible = isSyncProviderAllowed();
     [
         "cloudSpace",
         "sync.enabled",
@@ -173,14 +175,12 @@ const SYNC_PROVIDER_DEFS: Record<Config.ISync["provider"], SyncProviderDef> = {
         },
     },
     2: {
-        isProviderConfigAllowed: isPaidUser,
+        isProviderConfigAllowed: () => true,
         configKey: "s3",
 
         getConfig: () => window.siyuan.config.sync.s3,
         genIntro: () => `<div class="b3-label b3-label--inner">
     ${window.siyuan.languages.syncThirdPartyProviderS3Intro}
-    <div class="fn__hr"></div>
-    <em>${window.siyuan.languages.proFeature}</em>
     <div class="fn__hr"></div>
     ${window.siyuan.languages.syncThirdPartyProviderTip}
 </div>`,

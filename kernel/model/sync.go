@@ -404,7 +404,7 @@ func checkSync(boot, exit, byHand bool) bool {
 		}
 		return false
 	}
-	if nil == Conf.GetUser() {
+	if conf.ProviderS3 != confSyncReadSnapshot.Provider && nil == Conf.GetUser() {
 		return false
 	}
 
@@ -414,7 +414,7 @@ func checkSync(boot, exit, byHand bool) bool {
 			UpdateSyncConf(func(s *conf.Sync) { s.Enabled = false })
 			return false
 		}
-	case conf.ProviderWebDAV, conf.ProviderS3, conf.ProviderLocal:
+	case conf.ProviderWebDAV, conf.ProviderLocal:
 		if !IsPaidUser() {
 			UpdateSyncConf(func(s *conf.Sync) { s.Enabled = false })
 			return false
