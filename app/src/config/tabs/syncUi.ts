@@ -74,9 +74,9 @@ const setSyncModeRelatedConfigItemVisible = (root: Element) => {
         return;
     }
     const syncMode: Config.ISync["mode"] = Number(syncModeElement.value);
-    const isProviderOfficialAutoSync = syncMode === 1 && !needSubscribe("");
-    root.querySelector(`#${CSS.escape("sync.interval")}`)?.closest(".config-item")?.classList.toggle("fn__none", !isProviderOfficialAutoSync);
-    root.querySelector(`#${CSS.escape("sync.perception")}`)?.closest(".config-item")?.classList.toggle("fn__none", !(isProviderOfficialAutoSync && window.siyuan.config.sync.provider === 0 && window.siyuan.config.system.container !== "docker"));
+    const isAutoSync = syncMode === 1 && isSyncProviderAllowed();
+    root.querySelector(`#${CSS.escape("sync.interval")}`)?.closest(".config-item")?.classList.toggle("fn__none", !isAutoSync);
+    root.querySelector(`#${CSS.escape("sync.perception")}`)?.closest(".config-item")?.classList.toggle("fn__none", !(isAutoSync && window.siyuan.config.sync.provider === 0 && window.siyuan.config.system.container !== "docker"));
 };
 
 /** 同步提供商配置区检索关键词（供 syncTab 注册 slot） */

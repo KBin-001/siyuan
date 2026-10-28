@@ -17,7 +17,6 @@
 package api
 
 import (
-	"encoding/hex"
 	"io"
 	"os"
 	"path/filepath"
@@ -130,10 +129,8 @@ func importSyncProviderWebDAVContract(c *gin.Context, request apicontract.SyncPr
 		return
 	}
 
-	data = util.AESDecrypt(string(data))
-	data, _ = hex.DecodeString(string(data))
 	webdav := &conf.WebDAV{}
-	if err = gulu.JSON.UnmarshalJSON(data, webdav); err != nil {
+	if err = decodeSyncProviderConfig(data, webdav); err != nil {
 		logging.LogErrorf("import WebDAV provider failed: %s", err)
 		ret = apicontract.Failure[apicontract.SyncWebDAVData](-1, err.Error())
 		return
@@ -292,10 +289,8 @@ func importSyncProviderS3Contract(c *gin.Context, request apicontract.SyncProvid
 		return
 	}
 
-	data = util.AESDecrypt(string(data))
-	data, _ = hex.DecodeString(string(data))
 	s3 := &conf.S3{}
-	if err = gulu.JSON.UnmarshalJSON(data, s3); err != nil {
+	if err = decodeSyncProviderConfig(data, s3); err != nil {
 		logging.LogErrorf("import S3 provider failed: %s", err)
 		ret = apicontract.Failure[apicontract.SyncS3Data](-1, err.Error())
 		return

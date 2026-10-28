@@ -23,14 +23,20 @@ import (
 
 // manualS3Storage 是仅供集成测试使用的私有 S3 协议边界，不替换应用内的同步逻辑。
 type manualS3Storage struct {
-	mu      sync.Mutex
-	objects map[string][]byte
+	mu          sync.Mutex
+	objects     map[string][]byte
+	unavailable bool
 }
 
 func (storage *manualS3Storage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	storage.mu.Lock()
 	defer storage.mu.Unlock()
 	w.Header().Set("Content-Type", "application/xml")
+	if storage.unavailable {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		_, _ = io.WriteString(w, `<Error><Code>ServiceUnavailable</Code></Error>`)
+		return
+	}
 	if !strings.Contains(r.Header.Get("Authorization"), "Credential=test-key/") {
 		w.WriteHeader(http.StatusForbidden)
 		_, _ = io.WriteString(w, `<Error><Code>AccessDenied</Code></Error>`)

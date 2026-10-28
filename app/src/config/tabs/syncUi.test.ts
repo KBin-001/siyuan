@@ -368,8 +368,11 @@ const setupPanels = (mobile: boolean, paid = true) => {
     const row = createElement();
     const purge = createElement();
     const enabled = createElement();
+    const interval = createElement();
+    const perception = createElement();
+    const mode = {...createElement(), value: "1"};
     const elements = {"#syncProviderConfig": intro, "#syncProviderConfigRow": row, "#cloudRepoPurgeBlock": purge,
-        "#sync.enabled": enabled};
+        "#sync.enabled": enabled, "#sync.mode": mode, "#sync.interval": interval, "#sync.perception": perception};
     const root = {querySelector: (selector: string) => elements[selector as keyof typeof elements] || null};
     const exports = {} as {refreshSyncTabPanels: (root: unknown) => void;
         getSyncProviderConfigRowKeywords: () => string[]; getSyncProviderConfigKeywords: () => string[]};
@@ -379,8 +382,28 @@ const setupPanels = (mobile: boolean, paid = true) => {
         require: () => ({escapeHtmlTextAndAttr, canPurgeRepo, isInIOS: () => false, isPaidUser: () => paid, needSubscribe: () => !paid,
             getCloudURL: () => "https://example.com", getHostCapabilities: () => ({importExport: !mobile})}),
     });
-    return {sync, intro, row, purge, enabled, root, exports, languages};
+    return {sync, intro, row, purge, enabled, interval, perception, mode, root, exports, languages};
 };
+
+for (const mobile of [false, true]) {
+    test(`accountless S3 exposes its automatic interval without official push controls (mobile=${mobile})`, () => {
+        const ui = setupPanels(mobile, false);
+        ui.sync.provider = 2;
+        ui.exports.refreshSyncTabPanels(ui.root);
+        assert.equal(ui.interval.classList.contains("fn__none"), false);
+        assert.equal(ui.perception.classList.contains("fn__none"), true);
+        for (const mode of ["2", "3"]) {
+            ui.mode.value = mode;
+            ui.exports.refreshSyncTabPanels(ui.root);
+            assert.equal(ui.interval.classList.contains("fn__none"), true);
+        }
+        ui.sync.provider = 0;
+        ui.mode.value = "1";
+        ui.exports.refreshSyncTabPanels(ui.root);
+        assert.equal(ui.interval.classList.contains("fn__none"), true);
+        assert.equal(ui.perception.classList.contains("fn__none"), true);
+    });
+}
 
 test("S3 settings remain available without membership while other providers retain their entitlement", () => {
     const ui = setupPanels(false, false);
